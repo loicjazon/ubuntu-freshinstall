@@ -102,15 +102,23 @@ fi
 
 echo "Récupération des options de boot hybride de l'ISO source..."
 BOOT_OPTS_FILE="${WORK_DIR}/xorriso_opts.txt"
-xorriso -indev "${ISO_FILE}" -report_el_torito as_mkisofs > "${BOOT_OPTS_FILE}" 2>/dev/null || true
+xorriso -indev "${ISO_FILE}" -report_el_torito as_mkisofs > "${BOOT_OPTS_FILE}" 2>/dev/null
+
+# Le rapport xorriso emploie ses propres guillemets (nécessaires pour les
+# chemins/valeurs avec espaces ou deux-points, notamment les références GPT
+# hybrides de l'ISO 26.04). On garde tout le rapport tel quel (sauf la ligne
+# -V, remplacée par notre propre identifiant de volume) et on le réinjecte
+# via `eval` pour que xorriso ré-interprète correctement ces guillemets —
+# une simple substitution $(...) les laisserait tels quels et corromprait
+# les chemins de boot.
+BOOT_OPTS="$(grep -v "^-V " "${BOOT_OPTS_FILE}" | tr '\n' ' ')"
 
 echo "Reconstruction de l'ISO -> ${OUTPUT_ISO}..."
-# shellcheck disable=SC2046
-xorriso -as mkisofs \
-  -r -V "UbuntuAutoinstall" -J -joliet-long \
-  $(grep -E '^-(b|c|e|no-emul-boot|boot-load-size|boot-info-table|eltorito-alt-boot|isohybrid|-grub2)' "${BOOT_OPTS_FILE}" 2>/dev/null || true) \
-  -o "${OUTPUT_ISO}" \
-  "${WORK_DIR}/extracted"
+eval xorriso -as mkisofs \
+  -r -V "UBUNTUAUTOINSTALL" -J -joliet-long \
+  "${BOOT_OPTS}" \
+  -o "\"${OUTPUT_ISO}\"" \
+  "\"${WORK_DIR}/extracted\""
 
 echo "ISO générée : ${OUTPUT_ISO}"
 echo "Testez-la avec 'make test-vm' avant de l'écrire sur une clé USB réelle."
