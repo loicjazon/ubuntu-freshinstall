@@ -1,0 +1,63 @@
+---
+# NOTE Wayland (Ubuntu 26.04 est Wayland-only par défaut) : certaines
+# applications Electron/Java plus anciennes (JetBrains Toolbox, Slack)
+# peuvent présenter des soucis mineurs d'icône système ou de mise à
+# l'échelle sous Wayland pur. En cas de souci d'affichage, une session
+# "Ubuntu sur Xorg" reste sélectionnable à l'écran de connexion GDM comme
+# solution de repli (non activée par défaut ici). Voir README.md.
+
+- name: Créer le répertoire de destination /opt/<name>
+  ansible.builtin.file:
+    path: "/opt/{{ item.name }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ tarball_apps }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Télécharger l'archive tarball
+  ansible.builtin.get_url:
+    url: "{{ item.url }}"
+    dest: "/tmp/{{ item.name }}.tar.gz"
+    mode: "0644"
+    force: true
+  loop: "{{ tarball_apps }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Extraire l'archive dans /opt/<name>
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ item.name }}.tar.gz"
+    dest: "/opt/{{ item.name }}"
+    remote_src: true
+    extra_opts:
+      - "--strip-components=1"
+  loop: "{{ tarball_apps }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Créer le lien symbolique du binaire dans /usr/local/bin
+  ansible.builtin.file:
+    src: "/opt/{{ item.name }}/{{ item.binary_path }}"
+    dest: "/usr/local/bin/{{ item.name }}"
+    state: link
+    force: true
+  loop: "{{ tarball_apps }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Créer le fichier .desktop
+  ansible.builtin.copy:
+    dest: "/usr/share/applications/{{ item.name }}.desktop"
+    mode: "0644"
+    content: |
+      [Desktop Entry]
+      Type=Application
+      Name={{ item.desktop_name }}
+      Exec=/usr/local/bin/{{ item.name }}
+      Icon=/opt/{{ item.name }}/{{ item.name }}.svg
+      Terminal=false
+      Categories=Development;
+  loop: "{{ tarball_apps }}"
+  loop_control:
+    label: "{{ item.name }}"

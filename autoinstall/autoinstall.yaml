@@ -1,0 +1,75 @@
+#cloud-config
+# Fichier autoinstall pour Ubuntu 26.04 LTS "Resolute Raccoon" Desktop.
+#
+# Format curtin-subiquity `version: 1` — reste rétrocompatible en 26.04
+# malgré le nouvel installeur Flutter (même backend Subiquity).
+#
+# Le chiffrement disque matériel (HW FDE, beta en 26.04) N'EST PAS activé
+# ici : il nécessiterait `storage.layout.name: hybrid` +
+# `storage.layout.encrypted: yes`. Absence de ces clés = désactivé par
+# défaut. Voir README.md si vous souhaitez l'activer.
+autoinstall:
+  version: 1
+
+  # Ne pas préconfigurer l'identité utilisateur : Subiquity la demandera à
+  # l'écran au premier boot de l'installeur. Si des variables d'environnement
+  # (BUILD_USERNAME, BUILD_USER_PASSWORD, BUILD_HOSTNAME) sont exportées avant
+  # `make build-iso`, scripts/build-iso.sh remplace directement la section
+  # `identity` ci-dessous par des valeurs concrètes et retire cette entrée de
+  # `interactive-sections` — voir README.md pour les deux méthodes.
+  interactive-sections:
+    - identity
+
+  locale: fr_FR.UTF-8
+
+  keyboard:
+    layout: fr
+    variant: ""
+
+  # Disque entier, partitionnement LVM automatique (comportement par défaut
+  # de Subiquity quand storage.layout.name = lvm).
+  storage:
+    layout:
+      name: lvm
+
+  network:
+    version: 2
+    ethernets:
+      all-en:
+        match:
+          name: "en*"
+        dhcp4: true
+      all-eth:
+        match:
+          name: "eth*"
+        dhcp4: true
+
+  ssh:
+    install-server: true
+    allow-pw: false
+    authorized-keys: []
+
+  packages:
+    - openssh-server
+
+  # Ce placeholder est remplacé par une vraie section `identity:` par
+  # scripts/build-iso.sh si des variables d'environnement sont fournies au
+  # build. Le laisser tel quel si vous préférez la saisie interactive.
+  identity:
+    hostname: ubuntu-freshinstall
+    username: placeholder
+    password: "placeholder"
+
+  late-commands:
+    # Copie le script de provisioning et l'unit systemd dans le système
+    # cible, puis active le service SANS le démarrer maintenant : le
+    # réseau/environnement de l'installeur n'est pas fiable pour lancer le
+    # provisioning pendant late-commands. Il se déclenchera au vrai premier
+    # boot de la machine installée.
+    - curtin in-target --target=/target -- mkdir -p /opt/ubuntu-freshinstall
+    - cp /cdrom/nocloud/first-boot-provision.sh /target/opt/ubuntu-freshinstall/first-boot-provision.sh
+    - curtin in-target --target=/target -- chmod +x /opt/ubuntu-freshinstall/first-boot-provision.sh
+    - cp /cdrom/nocloud/first-boot-provision.service /target/etc/systemd/system/first-boot-provision.service
+    - curtin in-target --target=/target -- systemctl enable first-boot-provision.service
+
+  shutdown: reboot

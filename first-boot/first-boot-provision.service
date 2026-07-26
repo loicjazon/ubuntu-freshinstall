@@ -1,0 +1,17 @@
+[Unit]
+Description=Provisioning Ansible au premier boot (unique exécution)
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=!/opt/ubuntu-freshinstall/.provisioned
+
+[Service]
+Type=oneshot
+ExecStart=/opt/ubuntu-freshinstall/first-boot-provision.sh
+ExecStartPost=/usr/bin/touch /opt/ubuntu-freshinstall/.provisioned
+RemainAfterExit=true
+StandardOutput=journal+console
+StandardError=journal+console
+TimeoutStartSec=1800
+
+[Install]
+WantedBy=multi-user.target

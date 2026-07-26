@@ -1,0 +1,35 @@
+---
+- name: Télécharger les paquets .deb
+  ansible.builtin.get_url:
+    url: "{{ item.url }}"
+    dest: "/tmp/{{ item.name }}.deb"
+    mode: "0644"
+    force: true
+  loop: "{{ deb_url_packages }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Installer les paquets .deb téléchargés
+  ansible.builtin.apt:
+    deb: "/tmp/{{ item.name }}.deb"
+  loop: "{{ deb_url_packages }}"
+  loop_control:
+    label: "{{ item.name }}"
+  register: deb_url_packages_install_result
+  failed_when: false
+
+- name: Corriger les dépendances manquantes si besoin
+  ansible.builtin.apt:
+    name: []
+    state: fixed
+  when: >-
+    deb_url_packages_install_result.results
+    | selectattr('failed', 'defined') | selectattr('failed') | list | length > 0
+
+- name: Réessayer l'installation des .deb après correction des dépendances
+  ansible.builtin.apt:
+    deb: "/tmp/{{ item.item.name }}.deb"
+  loop: "{{ deb_url_packages_install_result.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  when: item.failed | default(false)

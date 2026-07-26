@@ -1,0 +1,47 @@
+---
+# Paquets APT installés depuis les dépôts officiels Ubuntu.
+apt_packages:
+  - git
+  - curl
+  - wget
+  - build-essential
+  - ca-certificates
+  - gnupg
+  - vim
+  - htop
+  - unzip
+  - stow
+
+# Applications distribuées en .deb via une URL directe (pas de dépôt apt tiers).
+deb_url_packages:
+  - name: google-chrome
+    # Lien permanent maintenu par Google, toujours à jour : aucune
+    # maintenance nécessaire ici.
+    url: "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
+  - name: slack
+    # Slack ne fournit pas de lien "latest" permanent (contrairement à
+    # Chrome) : cette URL est VERSIONNÉE et devra être mise à jour
+    # manuellement de temps en temps. Version constatée au moment de la
+    # rédaction : 4.51.180. Voir README.md.
+    url: "https://downloads.slack-edge.com/desktop-releases/linux/x64/4.51.180/slack-desktop-4.51.180-amd64.deb"
+
+# Paquets installés via snap.
+snap_packages:
+  - another-redis-desktop-manager
+
+# Applications distribuées en tarball, extraites dans /opt/<name>.
+tarball_apps:
+  - name: jetbrains-toolbox
+    # Endpoint de redirection officiel JetBrains qui pointe toujours vers la
+    # dernière version Linux x64 (302 vers l'archive versionnée) : pas de
+    # maintenance manuelle nécessaire ici, contrairement à Slack.
+    url: "https://data.services.jetbrains.com/products/download?platform=linux&code=TBA"
+    binary_path: "jetbrains-toolbox"
+    desktop_name: "JetBrains Toolbox"
+
+# URL du dépôt de dotfiles de l'utilisateur (jamais commitée ici). Laisser
+# vide pour désactiver le rôle `dotfiles`. À passer sur la ligne de commande :
+#   ansible-playbook -i inventory.ini site.yml --connection=local -e dotfiles_repo_url=git@github.com:user/dotfiles.git
+dotfiles_repo_url: ""
+dotfiles_repo_version: "HEAD"
+dotfiles_dest: "/home/{{ ansible_env.SUDO_USER | default(ansible_user_id) }}/dotfiles"

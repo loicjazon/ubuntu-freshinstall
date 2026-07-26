@@ -1,0 +1,12 @@
+---
+- name: Provisioning poste de dev Ubuntu
+  hosts: local
+  become: true
+  gather_facts: true
+
+  roles:
+    - apt_packages
+    - deb_url_packages
+    - snap_packages
+    - tarball_apps
+    - dotfiles
