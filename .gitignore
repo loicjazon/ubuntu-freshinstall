@@ -4,3 +4,4 @@ output/
 *.qcow2
 .ansible/
 *.retry
+.idea/
