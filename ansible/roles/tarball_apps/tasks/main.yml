@@ -42,6 +42,7 @@
     dest: "/usr/local/bin/{{ item.name }}"
     state: link
     force: true
+    follow: false
   loop: "{{ tarball_apps }}"
   loop_control:
     label: "{{ item.name }}"
