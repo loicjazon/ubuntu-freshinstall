@@ -49,8 +49,14 @@ autoinstall:
     allow-pw: false
     authorized-keys: []
 
+  # git et ansible sont nécessaires dès le premier boot par
+  # first-boot-provision.sh (clone du dépôt + ansible-playbook), donc
+  # installés ici plutôt que via le rôle apt_packages (trop tard : ce
+  # dernier tourne déjà À L'INTÉRIEUR du playbook Ansible).
   packages:
     - openssh-server
+    - git
+    - ansible
 
   # Ce placeholder est remplacé par une vraie section `identity:` par
   # scripts/build-iso.sh si des variables d'environnement sont fournies au

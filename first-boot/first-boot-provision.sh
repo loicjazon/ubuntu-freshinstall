@@ -2,8 +2,9 @@
 set -euo pipefail
 
 # URL du dépôt à cloner au premier boot réel de la machine installée.
-# Modifiez cette variable si le dépôt est renommé/déplacé.
-REPO_URL="git@github.com:loicjazon/ubuntu-freshinstall.git"
+# HTTPS anonyme (dépôt public) : aucune clé SSH à provisionner sur la
+# machine cible. Modifiez cette variable si le dépôt est renommé/déplacé.
+REPO_URL="https://github.com/loicjazon/ubuntu-freshinstall.git"
 
 INSTALL_DIR="/opt/ubuntu-freshinstall"
 LOG_FILE="/var/log/first-boot-provision.log"
@@ -17,7 +18,10 @@ wait_for_network() {
   echo "Attente de la connectivité réseau..."
   local attempt=0
   local max_attempts=60
-  until curl -fsS --max-time 5 https://github.com >/dev/null 2>&1; do
+  # Utilise le /dev/tcp natif de bash plutôt que curl/wget : aucune
+  # dépendance externe requise, alors qu'à ce stade seuls les paquets
+  # listés dans autoinstall.yaml (packages:) sont garantis installés.
+  until (exec 3<>/dev/tcp/github.com/443) 2>/dev/null; do
     attempt=$((attempt + 1))
     if [ "${attempt}" -ge "${max_attempts}" ]; then
       echo "Réseau indisponible après ${max_attempts} tentatives, abandon." >&2
@@ -40,8 +44,10 @@ clone_repo() {
 }
 
 run_provisioning() {
-  echo "Lancement du playbook Ansible..."
   cd "${INSTALL_DIR}/ansible"
+  echo "Installation des collections Ansible requises..."
+  ansible-galaxy collection install -r requirements.yml
+  echo "Lancement du playbook Ansible..."
   ansible-playbook -i inventory.ini site.yml --connection=local
 }
 
