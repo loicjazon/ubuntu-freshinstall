@@ -1,0 +1,30 @@
+---
+name: CI
+
+"on":
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Installer Python et les outils de lint
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install yamllint ansible ansible-lint
+
+      - name: Installer les collections Ansible requises
+        run: ansible-galaxy collection install -r ansible/requirements.yml
+
+      - name: yamllint
+        run: yamllint .
+
+      - name: ansible-lint
+        run: ansible-lint ansible/
+
+      - name: Vérification syntaxique du playbook
+        run: ansible-playbook -i ansible/inventory.ini ansible/site.yml --syntax-check

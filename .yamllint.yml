@@ -1,0 +1,26 @@
+---
+extends: default
+
+rules:
+  line-length:
+    max: 120
+    level: warning
+  comments:
+    min-spaces-from-content: 1
+    ignore: |-
+      autoinstall/autoinstall.yaml
+  comments-indentation: false
+  document-start:
+    ignore: |-
+      autoinstall/autoinstall.yaml
+  braces:
+    max-spaces-inside: 1
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
+  truthy:
+    allowed-values: ["true", "false", "yes", "no"]
+
+ignore: |
+  output/
+  downloads/

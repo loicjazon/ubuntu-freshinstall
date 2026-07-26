@@ -1,0 +1,6 @@
+downloads/
+output/
+*.iso
+*.qcow2
+.ansible/
+*.retry

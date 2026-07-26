@@ -1,0 +1,7 @@
+---
+- name: Installer les paquets snap
+  community.general.snap:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ snap_packages }}"
+  when: snap_packages | length > 0
