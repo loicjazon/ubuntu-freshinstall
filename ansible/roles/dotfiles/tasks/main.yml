@@ -2,7 +2,7 @@
 - name: Ignorer le rôle dotfiles si aucune URL n'est fournie
   ansible.builtin.debug:
     msg: "dotfiles_repo_url non défini, rôle dotfiles ignoré."
-  when: not dotfiles_repo_url
+  when: dotfiles_repo_url | length == 0
 
 - name: Cloner le dépôt de dotfiles
   ansible.builtin.git:
@@ -10,11 +10,11 @@
     dest: "{{ dotfiles_dest }}"
     version: "{{ dotfiles_repo_version }}"
     update: true
-  when: dotfiles_repo_url
+  when: dotfiles_repo_url | length > 0
 
 - name: Appliquer les dotfiles avec stow
   ansible.builtin.command:
     cmd: stow -v -t "{{ dotfiles_dest | dirname }}" .
     chdir: "{{ dotfiles_dest }}"
-  when: dotfiles_repo_url
+  when: dotfiles_repo_url | length > 0
   changed_when: true
