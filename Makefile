@@ -22,7 +22,7 @@ test-vm:
 		-smp 2 \
 		-cdrom $(OUTPUT_ISO) \
 		-drive file=output/test-vm-disk.qcow2,if=virtio,format=qcow2 \
-		-boot d
+		-boot once=d
 
 lint:
 	yamllint .
