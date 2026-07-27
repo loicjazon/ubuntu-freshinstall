@@ -1,4 +1,4 @@
-.PHONY: build-iso write-usb test-vm lint
+.PHONY: build-iso write-usb test-vm boot-vm lint
 
 OUTPUT_ISO := output/ubuntu-autoinstall.iso
 
@@ -23,6 +23,16 @@ test-vm:
 		-cdrom $(OUTPUT_ISO) \
 		-drive file=output/test-vm-disk.qcow2,if=virtio,format=qcow2 \
 		-boot once=d
+
+boot-vm:
+	@test -f output/test-vm-disk.qcow2 || { echo "Aucun disque de test (output/test-vm-disk.qcow2) : lancez d'abord make test-vm" >&2; exit 1; }
+	qemu-system-x86_64 \
+		-enable-kvm \
+		-m 4096 \
+		-smp 2 \
+		-drive file=output/test-vm-disk.qcow2,if=virtio,format=qcow2 \
+		-netdev user,id=net0 \
+		-device virtio-net-pci,netdev=net0
 
 lint:
 	yamllint .
