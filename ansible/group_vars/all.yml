@@ -36,6 +36,12 @@ deb_url_packages:
     # .deb stable : pas de maintenance manuelle nécessaire ici,
     # contrairement à Slack.
     url: "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
+  - name: forticlient-vpn
+    # Endpoint de redirection officiel Fortinet qui pointe toujours vers le
+    # dernier .deb du client VPN (FortiClient VPN standalone, pas la suite
+    # EMS complète) : pas de maintenance manuelle nécessaire ici,
+    # contrairement à Slack.
+    url: "https://links.fortinet.com/forticlient/deb/vpnagent"
 
 # Paquets installés via snap.
 snap_packages:
