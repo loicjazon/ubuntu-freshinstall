@@ -46,6 +46,7 @@ echo "Injection du seed autoinstall (nocloud)..."
 mkdir -p "${WORK_DIR}/extracted/nocloud"
 cp "${REPO_ROOT}/first-boot/first-boot-provision.sh" "${WORK_DIR}/extracted/nocloud/"
 cp "${REPO_ROOT}/first-boot/first-boot-provision.service" "${WORK_DIR}/extracted/nocloud/"
+cp "${REPO_ROOT}/first-boot/freshinstall-update.sh" "${WORK_DIR}/extracted/nocloud/"
 touch "${WORK_DIR}/extracted/nocloud/meta-data"
 
 AUTOINSTALL_SRC="${REPO_ROOT}/autoinstall/autoinstall.yaml"
