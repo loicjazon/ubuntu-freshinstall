@@ -118,12 +118,22 @@ définit comme shell par défaut — pas de variable à configurer, activé par
 défaut. Un `.zshrc` n'est créé que s'il n'existe pas déjà (n'écrase jamais
 une config existante lors d'un re-run).
 
-Pas besoin de relancer un build d'ISO pour tester un ajout : lancez
-directement le playbook sur une machine déjà installée :
+Pas besoin de relancer un build d'ISO pour tester un ajout. Sur une machine
+déjà installée (réelle ou VM), une commande est disponible partout dans le
+terminal (installée automatiquement dès l'autoinstall) pour tirer les
+derniers changements du dépôt et relancer le playbook :
 
 ```bash
+sudo freshinstall-update
+```
+
+Équivalent manuel si besoin :
+
+```bash
+cd /opt/ubuntu-freshinstall
+sudo git pull --ff-only
 cd ansible
-ansible-playbook -i inventory.ini site.yml --connection=local
+sudo ansible-playbook -i inventory.ini site.yml --connection=local
 ```
 
 ### Maintenance des URLs de téléchargement

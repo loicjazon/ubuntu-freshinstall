@@ -80,5 +80,10 @@ autoinstall:
     - curtin in-target --target=/target -- chmod +x /opt/first-boot-provision.sh
     - cp /cdrom/nocloud/first-boot-provision.service /target/etc/systemd/system/first-boot-provision.service
     - curtin in-target --target=/target -- systemctl enable first-boot-provision.service
+    # Commande "sudo freshinstall-update" disponible partout dans le
+    # terminal (déjà installée avant même le premier boot) : tire les
+    # derniers changements du dépôt et relance le playbook.
+    - cp /cdrom/nocloud/freshinstall-update.sh /target/usr/local/bin/freshinstall-update
+    - curtin in-target --target=/target -- chmod +x /usr/local/bin/freshinstall-update
 
   shutdown: reboot
