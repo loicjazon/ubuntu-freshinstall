@@ -94,6 +94,14 @@ make boot-vm
 
 Démarre directement sur `output/test-vm-disk.qcow2`, sans l'ISO.
 
+Si vous voulez au contraire repartir d'un disque vierge (retester
+l'installation complète depuis le début) :
+
+```bash
+make clean-vm
+make test-vm
+```
+
 ## Ajouter un logiciel
 
 Tout se passe dans `ansible/group_vars/all.yml` :

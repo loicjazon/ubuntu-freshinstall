@@ -1,4 +1,4 @@
-.PHONY: build-iso write-usb test-vm boot-vm lint
+.PHONY: build-iso write-usb test-vm boot-vm clean-vm lint
 
 OUTPUT_ISO := output/ubuntu-autoinstall.iso
 TEST_VM_DISK_SIZE := 40G
@@ -34,6 +34,10 @@ boot-vm:
 		-drive file=output/test-vm-disk.qcow2,if=virtio,format=qcow2 \
 		-netdev user,id=net0 \
 		-device virtio-net-pci,netdev=net0
+
+clean-vm:
+	rm -f output/test-vm-disk.qcow2
+	@echo "Disque de test supprimé. Le prochain 'make test-vm' en recréera un neuf ($(TEST_VM_DISK_SIZE))."
 
 lint:
 	yamllint .
