@@ -16,6 +16,12 @@ fi
 echo "=== Mise à jour du dépôt (${REPO_DIR}) ==="
 git -C "${REPO_DIR}" pull --ff-only
 
+# Se met à jour lui-même : sans ça, /usr/local/bin/freshinstall-update
+# resterait figé sur la version du jour de sa copie initiale, même après
+# un git pull qui modifie ce script dans le dépôt.
+cp "${REPO_DIR}/first-boot/freshinstall-update.sh" /usr/local/bin/freshinstall-update
+chmod +x /usr/local/bin/freshinstall-update
+
 echo "=== Installation des collections Ansible requises ==="
 ansible-galaxy collection install -r "${REPO_DIR}/ansible/requirements.yml"
 
