@@ -4,9 +4,28 @@
   become: true
   gather_facts: true
 
+  pre_tasks:
+    # Ni ansible_user_id ni ansible_env.SUDO_USER n'identifient le bon
+    # utilisateur ici : au premier boot, first-boot-provision.sh lance
+    # ansible-playbook directement en root via systemd, sans passer par
+    # sudo. On retrouve donc le compte humain (premier UID standard) via
+    # /etc/passwd, pour tout rôle qui doit écrire dans un $HOME.
+    - name: Déterminer l'utilisateur principal (premier compte humain, UID >= 1000)
+      ansible.builtin.shell:
+        cmd: "set -o pipefail && getent passwd | awk -F: '$3 >= 1000 && $3 < 65534 {print $1; exit}'"
+        executable: /bin/bash
+      register: _primary_user
+      changed_when: false
+
+    - name: Définir les facts de l'utilisateur principal
+      ansible.builtin.set_fact:
+        primary_user: "{{ _primary_user.stdout }}"
+        primary_user_home: "/home/{{ _primary_user.stdout }}"
+
   roles:
     - apt_packages
     - deb_url_packages
     - snap_packages
     - tarball_apps
+    - oh_my_zsh
     - dotfiles
