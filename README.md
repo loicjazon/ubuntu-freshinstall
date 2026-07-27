@@ -81,6 +81,19 @@ Démarre l'ISO générée dans QEMU/KVM avec un disque virtuel de test
 Pratique pour valider le seed autoinstall avant d'écrire sur du matériel
 réel.
 
+**Attention** : relancer `make test-vm` redémarre toujours depuis l'ISO
+(`-boot once=d` ne s'applique qu'au process QEMU en cours, pas d'un
+lancement à l'autre) — sur un disque déjà installé, l'installeur détectera
+des partitions existantes ("Unchanged") au lieu de faire un vrai test. Pour
+reprendre une VM déjà installée (ex : tester un ajout au playbook sans tout
+réinstaller) :
+
+```bash
+make boot-vm
+```
+
+Démarre directement sur `output/test-vm-disk.qcow2`, sans l'ISO.
+
 ## Ajouter un logiciel
 
 Tout se passe dans `ansible/group_vars/all.yml` :
