@@ -12,6 +12,7 @@ apt_packages:
   - unzip
   - stow
   - zsh
+  - btop
 
 # Applications distribuées en .deb via une URL directe (pas de dépôt apt tiers).
 deb_url_packages:
@@ -25,6 +26,16 @@ deb_url_packages:
     # manuellement de temps en temps. Version constatée au moment de la
     # rédaction : 4.51.180. Voir README.md.
     url: "https://downloads.slack-edge.com/desktop-releases/linux/x64/4.51.180/slack-desktop-4.51.180-amd64.deb"
+  - name: bitwarden
+    # Endpoint de redirection officiel Bitwarden qui pointe toujours vers
+    # la dernière release desktop Linux (.deb) sur GitHub : pas de
+    # maintenance manuelle nécessaire ici, contrairement à Slack.
+    url: "https://vault.bitwarden.com/download/?app=desktop&platform=linux&variant=deb"
+  - name: vscode
+    # Endpoint officiel Microsoft qui redirige toujours vers le dernier
+    # .deb stable : pas de maintenance manuelle nécessaire ici,
+    # contrairement à Slack.
+    url: "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
 
 # Paquets installés via snap.
 snap_packages:
@@ -39,6 +50,14 @@ tarball_apps:
     url: "https://data.services.jetbrains.com/products/download?platform=linux&code=TBA"
     binary_path: "jetbrains-toolbox"
     desktop_name: "JetBrains Toolbox"
+  - name: postman
+    # Endpoint officiel Postman qui sert toujours le dernier tarball Linux
+    # x64 : pas de maintenance manuelle nécessaire ici, contrairement à
+    # Slack.
+    url: "https://dl.pstmn.io/download/latest/linux64"
+    # Nom du binaire sensible à la casse (dossier extrait "Postman/").
+    binary_path: "Postman"
+    desktop_name: "Postman"
 
 # URL du dépôt de dotfiles de l'utilisateur (jamais commitée ici). Laisser
 # vide pour désactiver le rôle `dotfiles`. À passer sur la ligne de commande :
