@@ -28,4 +28,5 @@
     - snap_packages
     - tarball_apps
     - oh_my_zsh
+    - docker
     - dotfiles

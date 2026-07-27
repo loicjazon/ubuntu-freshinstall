@@ -118,6 +118,13 @@ définit comme shell par défaut — pas de variable à configurer, activé par
 défaut. Un `.zshrc` n'est créé que s'il n'existe pas déjà (n'écrase jamais
 une config existante lors d'un re-run).
 
+Le rôle `docker` installe Docker Engine + le plugin Compose v2 (`docker
+compose`, pas l'ancien binaire `docker-compose`) depuis le dépôt apt officiel
+Docker, et ajoute l'utilisateur principal au groupe `docker` pour pouvoir
+lancer des conteneurs sans `sudo`. **Une déconnexion/reconnexion (ou
+`newgrp docker`) est nécessaire** après l'installation pour que
+l'appartenance au groupe soit prise en compte dans la session en cours.
+
 Pas besoin de relancer un build d'ISO pour tester un ajout. Sur une machine
 déjà installée (réelle ou VM), une commande est disponible partout dans le
 terminal (installée automatiquement dès l'autoinstall) pour tirer les

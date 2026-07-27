@@ -1,0 +1,43 @@
+---
+# Dépôt apt officiel Docker (docs.docker.com/engine/install/ubuntu/),
+# plutôt que le paquet docker.io d'Ubuntu : versions Docker Engine et
+# Compose v2 toujours à jour.
+
+- name: Ajouter le dépôt apt officiel Docker (format deb822)
+  ansible.builtin.deb822_repository:
+    name: docker
+    types: deb
+    uris: https://download.docker.com/linux/ubuntu
+    suites: "{{ ansible_distribution_release }}"
+    components: stable
+    # Cible amd64 uniquement, comme le reste du projet (ISO autoinstall
+    # amd64 exclusivement).
+    architectures: amd64
+    signed_by: https://download.docker.com/linux/ubuntu/gpg
+    install_python_debian: true
+
+- name: Mettre à jour le cache apt après ajout du dépôt Docker
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Installer Docker Engine, CLI, containerd et le plugin Compose v2
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+
+- name: Démarrer et activer le service docker
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Ajouter l'utilisateur principal au groupe docker (usage sans sudo/root)
+  ansible.builtin.user:
+    name: "{{ primary_user }}"
+    groups: docker
+    append: true
