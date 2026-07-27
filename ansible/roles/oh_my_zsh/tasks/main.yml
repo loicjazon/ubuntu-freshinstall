@@ -1,0 +1,35 @@
+---
+- name: Vérifier si Oh My Zsh est déjà installé
+  ansible.builtin.stat:
+    path: "{{ primary_user_home }}/.oh-my-zsh"
+  register: oh_my_zsh_dir
+
+- name: Cloner Oh My Zsh
+  ansible.builtin.git:
+    repo: https://github.com/ohmyzsh/ohmyzsh.git
+    dest: "{{ primary_user_home }}/.oh-my-zsh"
+    depth: 1
+    version: master
+  become: true
+  become_user: "{{ primary_user }}"
+  when: not oh_my_zsh_dir.stat.exists
+
+- name: Vérifier si .zshrc existe déjà
+  ansible.builtin.stat:
+    path: "{{ primary_user_home }}/.zshrc"
+  register: oh_my_zsh_zshrc_file
+
+- name: Créer .zshrc à partir du template Oh My Zsh
+  ansible.builtin.copy:
+    src: "{{ primary_user_home }}/.oh-my-zsh/templates/zshrc.zsh-template"
+    dest: "{{ primary_user_home }}/.zshrc"
+    remote_src: true
+    owner: "{{ primary_user }}"
+    group: "{{ primary_user }}"
+    mode: "0644"
+  when: not oh_my_zsh_zshrc_file.stat.exists
+
+- name: Définir zsh comme shell par défaut de l'utilisateur principal
+  ansible.builtin.user:
+    name: "{{ primary_user }}"
+    shell: /usr/bin/zsh

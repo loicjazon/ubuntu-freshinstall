@@ -11,6 +11,7 @@ apt_packages:
   - htop
   - unzip
   - stow
+  - zsh
 
 # Applications distribuées en .deb via une URL directe (pas de dépôt apt tiers).
 deb_url_packages:
@@ -44,4 +45,4 @@ tarball_apps:
 #   ansible-playbook -i inventory.ini site.yml --connection=local -e dotfiles_repo_url=git@github.com:user/dotfiles.git
 dotfiles_repo_url: ""
 dotfiles_repo_version: "HEAD"
-dotfiles_dest: "/home/{{ ansible_env.SUDO_USER | default(ansible_user_id) }}/dotfiles"
+dotfiles_dest: "{{ primary_user_home }}/dotfiles"

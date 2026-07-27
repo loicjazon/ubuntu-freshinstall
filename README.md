@@ -91,6 +91,12 @@ Tout se passe dans `ansible/group_vars/all.yml` :
 - `tarball_apps` : `{name, url, binary_path, desktop_name}` pour une
   application distribuée en tarball, installée dans `/opt/<name>`.
 
+Le rôle `oh_my_zsh` installe `zsh` + [Oh My Zsh](https://ohmyz.sh/) pour
+l'utilisateur principal (premier compte humain détecté, UID >= 1000) et le
+définit comme shell par défaut — pas de variable à configurer, activé par
+défaut. Un `.zshrc` n'est créé que s'il n'existe pas déjà (n'écrase jamais
+une config existante lors d'un re-run).
+
 Pas besoin de relancer un build d'ISO pour tester un ajout : lancez
 directement le playbook sur une machine déjà installée :
 
