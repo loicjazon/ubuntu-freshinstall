@@ -6,7 +6,7 @@ ConditionPathExists=!/opt/ubuntu-freshinstall/.provisioned
 
 [Service]
 Type=oneshot
-ExecStart=/opt/ubuntu-freshinstall/first-boot-provision.sh
+ExecStart=/opt/first-boot-provision.sh
 ExecStartPost=/usr/bin/touch /opt/ubuntu-freshinstall/.provisioned
 RemainAfterExit=true
 StandardOutput=journal+console

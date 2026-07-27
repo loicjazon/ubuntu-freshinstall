@@ -72,9 +72,12 @@ autoinstall:
     # réseau/environnement de l'installeur n'est pas fiable pour lancer le
     # provisioning pendant late-commands. Il se déclenchera au vrai premier
     # boot de la machine installée.
-    - curtin in-target --target=/target -- mkdir -p /opt/ubuntu-freshinstall
-    - cp /cdrom/nocloud/first-boot-provision.sh /target/opt/ubuntu-freshinstall/first-boot-provision.sh
-    - curtin in-target --target=/target -- chmod +x /opt/ubuntu-freshinstall/first-boot-provision.sh
+    # Le script est placé à côté de (et non dans) /opt/ubuntu-freshinstall :
+    # ce dernier doit rester absent/vide pour que le `git clone` du premier
+    # boot puisse le créer (git refuse de cloner dans un dossier existant
+    # non vide).
+    - cp /cdrom/nocloud/first-boot-provision.sh /target/opt/first-boot-provision.sh
+    - curtin in-target --target=/target -- chmod +x /opt/first-boot-provision.sh
     - cp /cdrom/nocloud/first-boot-provision.service /target/etc/systemd/system/first-boot-provision.service
     - curtin in-target --target=/target -- systemctl enable first-boot-provision.service
 
