@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ubuntu-freshinstall-e2e — Récapitulatif</title>
+<style>
+  :root {
+    --bg: #14161b;
+    --bg-card: #1c1f26;
+    --border: #2a2e38;
+    --text: #e8eaed;
+    --text-dim: #9aa0ac;
+    --accent: #ff8a3d;
+    --accent-dim: #ff8a3d33;
+    --ok: #4ade80;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f5f6f8;
+      --bg-card: #ffffff;
+      --border: #e2e4e9;
+      --text: #1b1d22;
+      --text-dim: #5a6070;
+      --accent: #d9660b;
+      --accent-dim: #d9660b22;
+      --ok: #16a34a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", Ubuntu, Cantarell, Roboto, sans-serif;
+    line-height: 1.5;
+  }
+  .wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+  header {
+    margin-bottom: 40px;
+  }
+  header .kicker {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  header h1 {
+    margin: 0 0 8px;
+    font-size: 2rem;
+  }
+  header p {
+    margin: 0;
+    color: var(--text-dim);
+  }
+  h2 {
+    font-size: 1.15rem;
+    margin: 0 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  section {
+    margin-bottom: 36px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .card h3 {
+    margin: 0 0 10px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    font-weight: 600;
+  }
+  .card ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .card li {
+    padding: 4px 0;
+    font-size: 0.95rem;
+  }
+  .card li::before {
+    content: "•";
+    color: var(--accent);
+    margin-right: 8px;
+  }
+  .note {
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+  .todo {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 8px 20px;
+  }
+  .todo label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .todo label:last-child { border-bottom: none; }
+  .todo input[type="checkbox"] {
+    margin-top: 3px;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
+    flex-shrink: 0;
+  }
+  .todo span small {
+    display: block;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin-top: 2px;
+  }
+  .editable-hint {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin: -6px 0 16px;
+  }
+  footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  code {
+    background: var(--accent-dim);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Poste de dev prêt</div>
+    <h1>👋 Bienvenue sur ubuntu-freshinstall-e2e</h1>
+    <p>Provisionné automatiquement le 27 juillet 2026 — utilisateur <code>elji</code></p>
+  </header>
+
+  <section>
+    <h2>📦 Logiciels installés</h2>
+    <div class="grid">
+
+      <div class="card">
+        <h3>Outils système (apt)</h3>
+        <ul>
+          <li>git</li><li>curl</li><li>wget</li><li>build-essential</li>
+          <li>ca-certificates</li><li>gnupg</li><li>vim</li><li>htop</li>
+          <li>unzip</li><li>stow</li><li>zsh</li><li>btop</li><li>keepass2</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Applications</h3>
+        <ul>
+          <li>Google Chrome</li>
+          <li>Slack</li>
+          <li>Bitwarden</li>
+          <li>Visual Studio Code</li>
+          <li>FortiClient VPN</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Outils dev</h3>
+        <ul>
+          <li>JetBrains Toolbox</li>
+          <li>Postman</li>
+          <li>Another Redis Desktop Manager <small>(snap)</small></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Shell &amp; conteneurs</h3>
+        <ul>
+          <li>zsh + Oh My Zsh (shell par défaut)</li>
+          <li>Docker Engine + Compose v2</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>✅ Prochaines étapes</h2>
+    <p class="editable-hint">Cette liste est à toi — coche, édite ou remplace ces suggestions directement dans ce fichier.</p>
+    <div class="todo">
+      <label><input type="checkbox"><span>Se connecter à Bitwarden et importer/configurer ton coffre<small>Menu applications → Bitwarden</small></span></label>
+      <label><input type="checkbox"><span>Ajouter ta clé SSH GitHub<small><code>ssh-keygen -t ed25519 -C "toi@exemple.com"</code>, puis l'ajouter sur github.com/settings/keys</small></span></label>
+      <label><input type="checkbox"><span>Vérifier Docker sans sudo<small><code>docker run hello-world</code> — reconnecte-toi si ça échoue avec "permission denied"</small></span></label>
+      <label><input type="checkbox"><span>Configurer FortiClient VPN avec les identifiants de ton entreprise</span></label>
+      <label><input type="checkbox"><span>Personnaliser ton shell<small><code>~/.zshrc</code> a été créé par Oh My Zsh, à ajuster selon tes préférences</small></span></label>
+    </div>
+  </section>
+
+  <footer>
+    <span>Généré une seule fois à l'installation — jamais réécrit automatiquement, modifie-le librement.</span>
+    <a href="https://github.com/loicjazon/ubuntu-freshinstall">github.com/loicjazon/ubuntu-freshinstall</a>
+  </footer>
+
+</div>
+</body>
+</html>
