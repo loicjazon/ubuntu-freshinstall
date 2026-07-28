@@ -9,3 +9,4 @@ desktop_readme_display_names:
   vscode: "Visual Studio Code"
   forticlient-vpn: "FortiClient VPN"
   another-redis-desktop-manager: "Another Redis Desktop Manager"
+  glab: "GitLab CLI (glab)"
