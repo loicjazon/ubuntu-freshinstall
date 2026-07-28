@@ -125,6 +125,17 @@ lancer des conteneurs sans `sudo`. **Une déconnexion/reconnexion (ou
 `newgrp docker`) est nécessaire** après l'installation pour que
 l'appartenance au groupe soit prise en compte dans la session en cours.
 
+Le rôle `desktop_readme` place un `README.html` sur le Bureau de
+l'utilisateur (résolu via `xdg-user-dir DESKTOP` — attention, en `fr_FR` ce
+sera `~/Bureau`, pas `~/Desktop`) : récapitulatif visuel des logiciels
+installés + une section "prochaines étapes" à cocher/éditer librement.
+Généré **une seule fois** (comme `.zshrc`), jamais réécrit ensuite — pas de
+risque d'écraser tes modifications lors d'un futur `freshinstall-update`. Le
+mapping de noms d'affichage "propres" (`apt_packages` → noms bruts,
+`deb_url_packages`/`snap_packages` → noms lisibles) se trouve dans
+`ansible/roles/desktop_readme/defaults/main.yml`, à compléter au fil des
+ajouts de logiciels si besoin (fallback automatique sur le nom brut sinon).
+
 Pas besoin de relancer un build d'ISO pour tester un ajout. Sur une machine
 déjà installée (réelle ou VM), une commande est disponible partout dans le
 terminal (installée automatiquement dès l'autoinstall) pour tirer les

@@ -1,0 +1,43 @@
+---
+# README.html sur le Bureau : généré UNE SEULE FOIS (comme .zshrc dans le
+# rôle oh_my_zsh), jamais réécrit ensuite, pour que l'utilisateur puisse
+# éditer librement sa section "prochaines étapes" sans craindre un
+# écrasement par un futur freshinstall-update.
+
+- name: Créer/mettre à jour les dossiers XDG utilisateur selon la locale
+  # Nécessaire même hors session graphique : l'autoinstall utilise
+  # fr_FR.UTF-8, donc le vrai dossier est ~/Bureau et non ~/Desktop, mais
+  # ~/.config/user-dirs.dirs peut ne pas encore exister si l'utilisateur ne
+  # s'est jamais connecté en graphique avant que ce rôle tourne (premier
+  # boot). xdg-user-dirs-update le (re)crée explicitement selon la locale.
+  ansible.builtin.command:
+    cmd: xdg-user-dirs-update
+  become: true
+  become_user: "{{ primary_user }}"
+  environment:
+    HOME: "{{ primary_user_home }}"
+  changed_when: true
+
+- name: Résoudre le chemin réel du dossier Bureau
+  ansible.builtin.command:
+    cmd: xdg-user-dir DESKTOP
+  become: true
+  become_user: "{{ primary_user }}"
+  environment:
+    HOME: "{{ primary_user_home }}"
+  register: desktop_readme_dir_result
+  changed_when: false
+
+- name: Vérifier si README.html existe déjà sur le Bureau
+  ansible.builtin.stat:
+    path: "{{ desktop_readme_dir_result.stdout }}/README.html"
+  register: desktop_readme_file
+
+- name: Générer README.html sur le Bureau
+  ansible.builtin.template:
+    src: desktop-readme.html.j2
+    dest: "{{ desktop_readme_dir_result.stdout }}/README.html"
+    owner: "{{ primary_user }}"
+    group: "{{ primary_user }}"
+    mode: "0644"
+  when: not desktop_readme_file.stat.exists
