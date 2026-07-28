@@ -29,5 +29,6 @@
     - tarball_apps
     - oh_my_zsh
     - docker
+    - charles_proxy
     - dotfiles
     - desktop_readme

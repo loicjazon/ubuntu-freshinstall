@@ -1,0 +1,26 @@
+---
+# Dépôt apt officiel Charles Proxy (charlesproxy.com/documentation/installation/apt-repository/).
+# Le dépôt sert plusieurs paquets (charles-proxy = v4, charles-proxy3 = v3,
+# charles-proxy5 = v5) ; on installe la v5, la version actuelle.
+
+- name: Ajouter le dépôt apt officiel Charles Proxy (format deb822)
+  ansible.builtin.deb822_repository:
+    name: charles-proxy
+    types: deb
+    uris: https://www.charlesproxy.com/packages/apt/
+    suites: charles-proxy
+    components: main
+    # Cible amd64 uniquement, comme le reste du projet (ISO autoinstall
+    # amd64 exclusivement).
+    architectures: amd64
+    signed_by: https://www.charlesproxy.com/packages/apt/charles-repo.asc
+    install_python_debian: true
+
+- name: Mettre à jour le cache apt après ajout du dépôt Charles Proxy
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Installer Charles Proxy 5
+  ansible.builtin.apt:
+    name: charles-proxy5
+    state: present
