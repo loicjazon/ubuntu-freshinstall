@@ -17,6 +17,7 @@ apt_packages:
   - xdg-user-dirs
   - jq
   - tig
+  - filezilla
 
 # Applications distribuées en .deb via une URL directe (pas de dépôt apt tiers).
 deb_url_packages:
