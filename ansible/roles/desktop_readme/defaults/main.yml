@@ -1,0 +1,11 @@
+---
+# Noms d'affichage "propres" pour le README.html du Bureau. Toute entrée
+# absente de ce mapping s'affiche avec son nom brut (fallback), donc pas
+# besoin de tenir cette liste exhaustive à jour à chaque ajout de logiciel.
+desktop_readme_display_names:
+  google-chrome: "Google Chrome"
+  slack: "Slack"
+  bitwarden: "Bitwarden"
+  vscode: "Visual Studio Code"
+  forticlient-vpn: "FortiClient VPN"
+  another-redis-desktop-manager: "Another Redis Desktop Manager"

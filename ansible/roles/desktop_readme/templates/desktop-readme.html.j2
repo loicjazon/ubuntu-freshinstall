@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ubuntu-freshinstall-e2e — Récapitulatif</title>
+<title>{{ ansible_facts.hostname }} — Récapitulatif</title>
 <style>
   :root {
     --bg: #14161b;
@@ -169,8 +169,8 @@
 
   <header>
     <div class="kicker">Poste de dev prêt</div>
-    <h1>👋 Bienvenue sur ubuntu-freshinstall-e2e</h1>
-    <p>Provisionné automatiquement le 27 juillet 2026 — utilisateur <code>elji</code></p>
+    <h1>👋 Bienvenue sur {{ ansible_facts.hostname }}</h1>
+    <p>Provisionné automatiquement le {{ ansible_facts.date_time.date }} — utilisateur <code>{{ primary_user }}</code></p>
   </header>
 
   <section>
@@ -180,29 +180,30 @@
       <div class="card">
         <h3>Outils système (apt)</h3>
         <ul>
-          <li>git</li><li>curl</li><li>wget</li><li>build-essential</li>
-          <li>ca-certificates</li><li>gnupg</li><li>vim</li><li>htop</li>
-          <li>unzip</li><li>stow</li><li>zsh</li><li>btop</li><li>keepass2</li>
+{% for pkg in apt_packages %}
+          <li>{{ pkg }}</li>
+{% endfor %}
         </ul>
       </div>
 
       <div class="card">
         <h3>Applications</h3>
         <ul>
-          <li>Google Chrome</li>
-          <li>Slack</li>
-          <li>Bitwarden</li>
-          <li>Visual Studio Code</li>
-          <li>FortiClient VPN</li>
+{% for app in deb_url_packages %}
+          <li>{{ desktop_readme_display_names.get(app.name, app.name) }}</li>
+{% endfor %}
         </ul>
       </div>
 
       <div class="card">
         <h3>Outils dev</h3>
         <ul>
-          <li>JetBrains Toolbox</li>
-          <li>Postman</li>
-          <li>Another Redis Desktop Manager <small>(snap)</small></li>
+{% for app in tarball_apps %}
+          <li>{{ app.desktop_name | default(app.name) }}</li>
+{% endfor %}
+{% for pkg in snap_packages %}
+          <li>{{ desktop_readme_display_names.get(pkg, pkg) }} <small>(snap)</small></li>
+{% endfor %}
         </ul>
       </div>
 
@@ -226,6 +227,9 @@
       <label><input type="checkbox"><span>Vérifier Docker sans sudo<small><code>docker run hello-world</code> — reconnecte-toi si ça échoue avec "permission denied"</small></span></label>
       <label><input type="checkbox"><span>Configurer FortiClient VPN avec les identifiants de ton entreprise</span></label>
       <label><input type="checkbox"><span>Personnaliser ton shell<small><code>~/.zshrc</code> a été créé par Oh My Zsh, à ajuster selon tes préférences</small></span></label>
+{% if dotfiles_repo_url | length > 0 %}
+      <label><input type="checkbox"><span>Vérifier tes dotfiles<small>Clonés depuis {{ dotfiles_repo_url }}</small></span></label>
+{% endif %}
     </div>
   </section>
 
