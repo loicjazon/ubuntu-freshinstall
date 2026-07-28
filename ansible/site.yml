@@ -31,5 +31,6 @@
     - docker
     - charles_proxy
     - sublime_text
+    - github_cli
     - dotfiles
     - desktop_readme

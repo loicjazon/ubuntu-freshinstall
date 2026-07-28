@@ -1,0 +1,25 @@
+---
+# Dépôt apt officiel GitHub CLI (cli.github.com/manual/installation).
+# Équivalent de glab (snap_packages) mais pour GitHub.
+
+- name: Ajouter le dépôt apt officiel GitHub CLI (format deb822)
+  ansible.builtin.deb822_repository:
+    name: github-cli
+    types: deb
+    uris: https://cli.github.com/packages
+    suites: stable
+    components: main
+    # Cible amd64 uniquement, comme le reste du projet (ISO autoinstall
+    # amd64 exclusivement).
+    architectures: amd64
+    signed_by: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+    install_python_debian: true
+
+- name: Mettre à jour le cache apt après ajout du dépôt GitHub CLI
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Installer GitHub CLI (gh)
+  ansible.builtin.apt:
+    name: gh
+    state: present
