@@ -19,6 +19,8 @@ apt_packages:
   - tig
   - filezilla
   - terminator
+  - python3
+  - python3-pip
 
 # Applications distribuées en .deb via une URL directe (pas de dépôt apt tiers).
 deb_url_packages:
