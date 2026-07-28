@@ -110,7 +110,12 @@ Tout se passe dans `ansible/group_vars/all.yml` :
 - `deb_url_packages` : `{name, url}` pour un `.deb` téléchargé directement.
 - `snap_packages` : liste simple de paquets snap.
 - `tarball_apps` : `{name, url, binary_path, desktop_name}` pour une
-  application distribuée en tarball, installée dans `/opt/<name>`.
+  application distribuée en tarball, installée dans `/opt/<name>`. **Note** :
+  la recherche d'applications GNOME (Activités) ne les indexe parfois qu'après
+  un premier lancement — si l'app n'apparaît pas tout de suite dans la
+  recherche, lance-la une fois via son `.desktop` (menu Activités en tapant
+  le nom exact) ou directement `/opt/<name>/<binary_path>` dans un terminal ;
+  elle apparaîtra ensuite normalement dans les recherches suivantes.
 
 Le rôle `oh_my_zsh` installe `zsh` + [Oh My Zsh](https://ohmyz.sh/) pour
 l'utilisateur principal (premier compte humain détecté, UID >= 1000) et le
