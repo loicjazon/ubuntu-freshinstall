@@ -51,6 +51,7 @@ deb_url_packages:
 # Paquets installés via snap.
 snap_packages:
   - another-redis-desktop-manager
+  - glab
 
 # Applications distribuées en tarball, extraites dans /opt/<name>.
 tarball_apps:
