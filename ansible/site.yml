@@ -32,5 +32,6 @@
     - charles_proxy
     - sublime_text
     - github_cli
+    - claude_code
     - dotfiles
     - desktop_readme

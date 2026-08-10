@@ -1,0 +1,27 @@
+---
+# Dépôt apt officiel Claude Code (code.claude.com/docs/en/setup#install-with-linux-package-managers).
+# Canal "stable" (~1 semaine de décalage, releases à régression majeure
+# sautées) : suffisant ici, la mise à jour se fait via apt comme le reste
+# du système (cf. freshinstall-update), pas besoin du canal "latest".
+
+- name: Ajouter le dépôt apt officiel Claude Code (format deb822, canal stable)
+  ansible.builtin.deb822_repository:
+    name: claude-code
+    types: deb
+    uris: https://downloads.claude.ai/claude-code/apt/stable
+    suites: stable
+    components: main
+    # Cible amd64 uniquement, comme le reste du projet (ISO autoinstall
+    # amd64 exclusivement).
+    architectures: amd64
+    signed_by: https://downloads.claude.ai/keys/claude-code.asc
+    install_python_debian: true
+
+- name: Mettre à jour le cache apt après ajout du dépôt Claude Code
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Installer Claude Code
+  ansible.builtin.apt:
+    name: claude-code
+    state: present
