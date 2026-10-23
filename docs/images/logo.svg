@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="t">
+  <title id="t">ubuntu-freshinstall</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E5483C"/>
+      <stop offset="1" stop-color="#B8241B"/>
+    </linearGradient>
+  </defs>
+  <!-- Fenêtre de terminal -->
+  <rect x="8" y="14" width="112" height="100" rx="14" fill="url(#bg)"/>
+  <circle cx="26" cy="31" r="5" fill="#fff" fill-opacity=".55"/>
+  <circle cx="42" cy="31" r="5" fill="#fff" fill-opacity=".55"/>
+  <circle cx="58" cy="31" r="5" fill="#fff" fill-opacity=".55"/>
+  <!-- Invite de commande -->
+  <path d="M30 58 50 74 30 90" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M62 90h34" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
+</svg>

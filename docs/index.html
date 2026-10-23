@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="fr" data-theme="rouge" data-mode="light">
+<head>
+<meta charset="utf-8">
+<meta name="theme-color" content="#f9fafb">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ubuntu-freshinstall : un poste de dev Ubuntu prêt en un boot</title>
+<link rel="icon" type="image/svg+xml" href="images/logo.svg">
+<meta name="description" content="De l'ISO d'installation à un poste de dev Ubuntu 26.04 LTS opérationnel : autoinstall, premier boot et playbook Ansible, sans aucune étape manuelle.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=JetBrains+Mono:wght@400;600&family=Martian+Mono:wght@500;700&display=swap">
+<style>
+  /* Design « terminal », accent rouge, mode clair. */
+  :root {
+    color-scheme: light;
+    --bg-primary: #f9fafb;
+    --bg-secondary: #f0f3f7;
+    --bg-surface: #ffffff;
+    --border-default: #cbd5e1;
+    --border-hover: #94a3b8;
+    --text-primary: #111827;
+    --text-secondary: #334155;
+    --text-muted: #475569;
+    /* Rouge assombri pour garder un contraste AA sur fond clair. */
+    --accent: #c8322a;
+    --accent-hover: #a3241d;
+    --accent-foreground: #ffffff;
+    --success: #15803d;
+    --warning: #b45309;
+    --danger: #c8322a;
+    /* Les panneaux terminal restent sombres, comme un vrai terminal. */
+    --term-bg: #0b1520;
+    --term-border: #26384a;
+    --term-text: #f2f6fc;
+    --term-muted: #91a3b7;
+    --term-accent: #ff6b61;
+    --term-ok: #35c98a;
+    --container-width: 1200px;
+    --reading-width: 720px;
+    --radius: 4px;
+    --font-heading: 'Martian Mono', 'IBM Plex Mono', ui-monospace, monospace;
+    --font-body: 'IBM Plex Sans', system-ui, -apple-system, "Segoe UI", Ubuntu, sans-serif;
+    --font-code: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font: 16px/1.65 var(--font-body);
+  }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  a:hover { color: var(--accent-hover); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .wrap { max-width: var(--container-width); margin: 0 auto; padding: 0 16px; }
+  @media (min-width: 760px) { .wrap { padding: 0 32px; } }
+  .accent { color: var(--accent); }
+  h1, h2, h3 { font-family: var(--font-heading); line-height: 1.2; font-weight: 700; }
+  .eyebrow {
+    font: 12px/1.4 var(--font-code); letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 12px;
+  }
+
+  /* Navigation */
+  .topbar { border-bottom: 1px solid var(--border-default); background: var(--bg-surface); }
+  .topbar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; }
+  .brand {
+    display: inline-flex; align-items: center; gap: 10px;
+    font: 700 16px var(--font-heading); color: var(--text-primary); text-decoration: none;
+  }
+  .brand:hover { color: var(--text-primary); }
+  .topbar nav { display: flex; gap: 20px; font: 13px var(--font-code); }
+  .topbar nav a { color: var(--text-secondary); text-decoration: none; }
+  .topbar nav a:hover { color: var(--accent); }
+  @media (max-width: 760px) { .topbar nav .hide-sm { display: none; } }
+
+  /* En-tête */
+  .hero { padding: 48px 0 40px; display: grid; gap: 48px; align-items: center; }
+  @media (min-width: 960px) { .hero { grid-template-columns: 1fr 1fr; padding: 64px 0 48px; } }
+  .hero h1 { font-size: clamp(1.9rem, 5vw, 3.1rem); margin: 0 0 20px; letter-spacing: -0.03em; overflow-wrap: anywhere; }
+  .hero p.lead { font-size: 1.15rem; color: var(--text-secondary); max-width: 32em; margin: 0 0 28px; text-wrap: balance; }
+  .badges { list-style: none; padding: 0; margin: 0 0 28px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .badges li {
+    display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px;
+    border: 1px solid var(--border-default); border-radius: var(--radius); background: var(--bg-surface);
+    font: 13px var(--font-code); color: var(--text-primary);
+  }
+  .badges svg { flex: none; color: var(--accent); }
+  .badges small { color: var(--text-muted); font-size: 12px; }
+  .links { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 11px 18px; border: 1px solid var(--border-default); border-radius: var(--radius);
+    background: var(--bg-surface); color: var(--text-primary); text-decoration: none; font: 14px var(--font-code);
+    transition: border-color .15s, background-color .15s, color .15s;
+  }
+  .btn:hover { border-color: var(--border-hover); color: var(--text-primary); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-foreground); font-weight: 600; }
+  .btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: var(--accent-foreground); }
+
+  /* Panneau terminal */
+  .terminal { border: 1px solid var(--term-border); border-radius: var(--radius); background: var(--term-bg); min-width: 0; }
+  .terminal .bar {
+    position: relative; display: flex; align-items: center; justify-content: center; height: 40px;
+    border-bottom: 1px solid var(--term-border); font: 12px var(--font-code); color: var(--term-muted);
+  }
+  .terminal .dots { position: absolute; left: 16px; display: inline-flex; gap: 7px; }
+  .terminal .dots i { width: 11px; height: 11px; border-radius: 50%; background: #ff5e69; }
+  .terminal .dots i:nth-child(2) { background: #ffbd4a; }
+  .terminal .dots i:nth-child(3) { background: #35c98a; }
+  .terminal pre {
+    margin: 0; padding: 20px; white-space: pre-wrap; overflow-wrap: anywhere;
+    font: 14px/1.75 var(--font-code); color: var(--term-text);
+  }
+  .terminal .prompt { color: var(--term-muted); }
+  .terminal .ok { color: var(--term-ok); }
+  .terminal .dim { color: var(--term-muted); }
+  .terminal .hl { color: var(--term-accent); font-weight: 600; }
+
+  /* Ligne de commande copiable */
+  .cmdline {
+    display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 20px;
+    border: 1px solid var(--border-default); border-radius: var(--radius); background: var(--bg-surface);
+  }
+  .cmdline pre {
+    flex: 1; min-width: 0; margin: 0; padding: 10px 0; white-space: pre-wrap; overflow-wrap: anywhere;
+    font: 15px/1.7 var(--font-code); color: var(--accent);
+  }
+  .cmdline .prompt { color: var(--text-muted); user-select: none; }
+  .cmdline button {
+    flex: none; display: inline-flex; align-items: center; gap: 8px;
+    border: 1px solid var(--border-default); border-radius: var(--radius); background: transparent;
+    color: var(--text-primary); padding: 10px 16px; font: 14px var(--font-code); cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  .cmdline button:hover { border-color: var(--accent); color: var(--accent); }
+  .checks {
+    list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-wrap: wrap;
+    gap: 12px 40px;
+    font: 14px/1.5 var(--font-code); color: var(--text-secondary);
+  }
+  @media (min-width: 1100px) { .checks { justify-content: space-between; } }
+  .checks li { display: flex; align-items: center; gap: 12px; }
+  .checks svg { flex: none; color: var(--accent); }
+
+  /* Logiciels installés */
+  .soft-card h3 { font-size: 14px; margin: 0 0 4px; display: flex; align-items: center; gap: 10px; }
+  .soft-card h3 svg { flex: none; color: var(--accent); }
+  .soft-card .how { margin: 0 0 14px; font: 12px var(--font-code); color: var(--text-muted); }
+  .tags { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .tags li {
+    padding: 2px 8px; border: 1px solid var(--border-default); border-radius: var(--radius);
+    background: var(--bg-primary); font: 13px/1.6 var(--font-code); color: var(--text-primary);
+  }
+
+  /* Commandes make */
+  .cmd-table { width: 100%; border-collapse: collapse; background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius); }
+  .cmd-table th, .cmd-table td { text-align: left; padding: 14px 20px; border-top: 1px solid var(--border-default); vertical-align: top; }
+  .cmd-table thead th { border-top: 0; font: 12px var(--font-code); letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); background: var(--bg-secondary); }
+  .cmd-table td:first-child { white-space: nowrap; font: 600 14px var(--font-code); color: var(--accent); }
+  .cmd-table td { color: var(--text-secondary); }
+  @media (max-width: 640px) {
+    .cmd-table thead { display: none; }
+    .cmd-table tr { display: block; border-top: 1px solid var(--border-default); padding: 12px 16px; }
+    .cmd-table tbody tr:first-child { border-top: 0; }
+    .cmd-table td { display: block; border: 0; padding: 0; }
+    .cmd-table td:first-child { white-space: normal; margin-bottom: 4px; }
+  }
+
+  /* Liens utiles */
+  .links-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .link-card {
+    position: relative; display: flex; gap: 16px; padding-bottom: 40px;
+    color: var(--text-secondary); text-decoration: none; font-size: 0.95rem;
+  }
+  .link-card:hover { color: var(--text-secondary); border-color: var(--accent); }
+  .link-card strong { display: block; margin-bottom: 6px; font: 600 15px var(--font-heading); color: var(--text-primary); }
+  .link-icon { flex: none; color: var(--text-primary); }
+  .link-card .arrow { position: absolute; right: 18px; bottom: 14px; font: 18px var(--font-code); color: var(--text-muted); transition: color .15s, transform .15s; }
+  .link-card:hover .arrow { color: var(--accent); transform: translateX(3px); }
+
+  /* Sections */
+  section { border-top: 1px solid var(--border-default); padding: 32px 0 36px; }
+  .section-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 4px 24px; margin-bottom: 20px; }
+  .section-head .eyebrow { margin-bottom: 8px; }
+  h2 { font-size: clamp(1.4rem, 3vw, 1.8rem); margin: 0; letter-spacing: -0.02em; }
+  .sub { color: var(--text-secondary); margin: 0; font: 13px/1.6 var(--font-code); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius);
+    padding: 16px 20px; height: 100%; transition: border-color .15s;
+  }
+  .card:hover { border-color: var(--border-hover); }
+  .num { display: block; font: 13px var(--font-code); color: var(--accent); margin-bottom: 12px; }
+  ol.steps { list-style: none; padding: 0; margin: 0; }
+  ol.steps li { color: var(--text-secondary); }
+  ol.steps h3 { font-size: 14px; color: var(--text-primary); margin: 0 0 8px; }
+  ol.steps .file { display: block; margin-top: 12px; }
+  .req-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  h3.os { font-size: 14px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+  h3.os svg { color: var(--accent); }
+  ul.req { margin: 0; padding: 0; list-style: none; color: var(--text-secondary); }
+  ul.req li { margin: 10px 0 0; padding-left: 20px; position: relative; }
+  ul.req li::before { content: "›"; position: absolute; left: 4px; color: var(--accent); font-family: var(--font-code); }
+  ul.req strong { color: var(--text-primary); }
+  code.inline {
+    font: 0.86em var(--font-code); color: var(--text-primary);
+    background: var(--bg-secondary); border: 1px solid var(--border-default); border-radius: var(--radius); padding: 1px 5px;
+    overflow-wrap: anywhere;
+  }
+
+  footer { border-top: 1px solid var(--border-default); background: var(--bg-surface); padding: 28px 0 36px; color: var(--text-muted); font-size: 0.92rem; }
+  .footer-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 32px; }
+  .footer-brand { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 16px; margin: 0; }
+  .footer-links { display: flex; flex-wrap: wrap; align-items: center; font: 13px var(--font-code); }
+  .footer-links a { display: inline-flex; align-items: center; gap: 8px; color: var(--text-secondary); text-decoration: none; }
+  .footer-links a:hover { color: var(--accent); }
+  .footer-links a + a::before { content: "|"; color: var(--border-hover); margin: 0 14px; }
+  @media (max-width: 640px) {
+    .footer-links { gap: 8px 20px; }
+    .footer-links a + a::before { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="images/logo.svg" alt="" width="28" height="28"><span>ubuntu<span class="accent">-freshinstall</span></span></a>
+    <nav aria-label="Sections">
+      <a class="hide-sm" href="#fonctionnement">fonctionnement</a>
+      <a class="hide-sm" href="#logiciels">logiciels</a>
+      <a class="hide-sm" href="#commandes">commandes</a>
+      <a href="https://github.com/loicjazon/ubuntu-freshinstall">github ↗</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap" id="top">
+  <div class="hero">
+    <div>
+      <h1>ubuntu <span class="accent">freshinstall</span></h1>
+      <p class="lead">De l'ISO d'installation à un poste de dev opérationnel, sans aucune étape manuelle après le premier&nbsp;boot.</p>
+      <ul class="badges" aria-label="Technologies">
+        <li><svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>Ubuntu 26.04 LTS <small>Resolute Raccoon</small></li>
+        <li><svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 21h18Z"/><path d="M9 15h6"/></svg>Ansible</li>
+        <li><svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l6-6-6-6M12 19h8"/></svg>autoinstall</li>
+      </ul>
+      <div class="links">
+        <a class="btn primary" href="#demarrage">Démarrer →</a>
+        <a class="btn" href="https://github.com/loicjazon/ubuntu-freshinstall">Voir sur GitHub</a>
+      </div>
+    </div>
+    <div class="terminal">
+      <div class="bar">
+        <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="title">ubuntu-freshinstall</span>
+      </div>
+      <pre role="img" aria-label="Étapes : cloner le dépôt, construire l'ISO avec make build-iso, l'écrire sur une clé USB avec make write-usb, puis démarrer la machine cible : le premier boot installe tout automatiquement."><span class="dim"># 1. Construire l'ISO autoinstall</span>
+<span class="prompt">$ </span>make build-iso
+  <span class="ok">✓</span> output/ubuntu-autoinstall.iso
+
+<span class="dim"># 2. L'écrire sur une clé USB</span>
+<span class="prompt">$ </span>make write-usb DEVICE=/dev/sdX
+
+<span class="dim"># 3. Démarrer la machine cible sur la clé</span>
+  <span class="ok">✓</span> Installation non interactive
+  <span class="ok">✓</span> Premier boot : clone du dépôt
+  <span class="ok">✓</span> Playbook Ansible en local
+
+  <span class="hl">Poste prêt.</span> <span class="dim">Aucune étape manuelle.</span></pre>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section id="demarrage">
+    <div class="section-head">
+      <div>
+      <p class="eyebrow">[ 01 ]</p>
+      <h2>Démarrage rapide</h2>
+      </div>
+      <p class="sub">Cloner, construire l'ISO, booter.</p>
+    </div>
+    <div class="cmdline">
+      <pre><span class="prompt" aria-hidden="true">$ </span><code data-cmd>git clone https://github.com/loicjazon/ubuntu-freshinstall.git &amp;&amp; cd ubuntu-freshinstall &amp;&amp; make build-iso</code></pre>
+      <button type="button" data-copy aria-label="Copier la commande de démarrage"><svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><span>Copier</span></button>
+    </div>
+    <ul class="checks">
+      <li><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="m7 12.5 3.2 3.2L17 9" fill="none" stroke="var(--accent-foreground)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Télécharge l'ISO officielle si absente</li>
+      <li><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="m7 12.5 3.2 3.2L17 9" fill="none" stroke="var(--accent-foreground)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Mot de passe haché en <code class="inline">SHA-512</code></li>
+      <li><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="m7 12.5 3.2 3.2L17 9" fill="none" stroke="var(--accent-foreground)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Testable dans QEMU avant la clé USB</li>
+    </ul>
+  </section>
+
+  <section id="fonctionnement">
+    <div class="section-head">
+      <div>
+      <p class="eyebrow">[ 02 ]</p>
+      <h2>Comment ça marche ?</h2>
+      </div>
+      <p class="sub">Trois étapes, enchaînées automatiquement.</p>
+    </div>
+    <ol class="steps grid">
+      <li class="card"><span class="num">01 /</span><h3>Autoinstall</h3>Un seed pilote l'installeur Ubuntu sans interaction : locale française, clavier AZERTY, LVM sur disque entier, réseau en DHCP, SSH.<code class="inline file">autoinstall/autoinstall.yaml</code></li>
+      <li class="card"><span class="num">02 /</span><h3>Premier boot</h3>Un service systemd attend le réseau, clone ce dépôt puis lance le playbook en local. Il se désactive une fois terminé.<code class="inline file">first-boot/first-boot-provision.sh</code></li>
+      <li class="card"><span class="num">03 /</span><h3>Playbook Ansible</h3>Paquets apt, <code class="inline">.deb</code>, snaps, applications en tarball, Docker, Oh My Zsh et dotfiles optionnels.<code class="inline file">ansible/site.yml</code></li>
+    </ol>
+  </section>
+
+  <section id="logiciels">
+    <div class="section-head">
+      <div>
+      <p class="eyebrow">[ 03 ]</p>
+      <h2>Logiciels installés</h2>
+      </div>
+      <p class="sub">Tout se configure dans <code class="inline">ansible/group_vars/all.yml</code>.</p>
+    </div>
+    <div class="grid">
+      <div class="card soft-card">
+        <h3><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3M13 15h4"/></svg>Terminal &amp; shell</h3>
+        <p class="how">apt · oh_my_zsh</p>
+        <ul class="tags"><li>zsh + Oh My Zsh</li><li>Terminator</li><li>git</li><li>tig</li><li>vim</li><li>htop</li><li>btop</li><li>jq</li><li>curl</li><li>wget</li><li>stow</li></ul>
+      </div>
+      <div class="card soft-card">
+        <h3><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Éditeurs &amp; IDE</h3>
+        <p class="how">.deb · dépôt apt · tarball</p>
+        <ul class="tags"><li>Visual Studio Code</li><li>Sublime Text</li><li>JetBrains Toolbox</li></ul>
+      </div>
+      <div class="card soft-card">
+        <h3><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5Z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>Conteneurs &amp; API</h3>
+        <p class="how">dépôt apt · tarball · snap</p>
+        <ul class="tags"><li>Docker + Compose v2</li><li>Postman</li><li>Charles Proxy</li><li>Another Redis Desktop Manager</li></ul>
+      </div>
+      <div class="card soft-card">
+        <h3><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4"/><circle cx="12" cy="12" r="4"/></svg>Outils CLI</h3>
+        <p class="how">dépôt apt · snap</p>
+        <ul class="tags"><li>Claude Code</li><li>gh</li><li>glab</li><li>python3 + pip</li><li>build-essential</li></ul>
+      </div>
+      <div class="card soft-card">
+        <h3><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>Web &amp; communication</h3>
+        <p class="how">.deb · apt</p>
+        <ul class="tags"><li>Google Chrome</li><li>Slack</li><li>FortiClient VPN</li><li>FileZilla</li></ul>
+      </div>
+      <div class="card soft-card">
+        <h3><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Mots de passe</h3>
+        <p class="how">.deb · apt</p>
+        <ul class="tags"><li>Bitwarden</li><li>KeePass2</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="commandes">
+    <div class="section-head">
+      <div>
+      <p class="eyebrow">[ 04 ]</p>
+      <h2>Commandes</h2>
+      </div>
+      <p class="sub">Tout passe par le Makefile.</p>
+    </div>
+    <table class="cmd-table">
+      <thead><tr><th scope="col">Commande</th><th scope="col">Effet</th></tr></thead>
+      <tbody>
+        <tr><td>make build-iso</td><td>Télécharge l'ISO Ubuntu 26.04 Desktop si besoin, y injecte le seed autoinstall et produit <code class="inline">output/ubuntu-autoinstall.iso</code>.</td></tr>
+        <tr><td>make write-usb DEVICE=/dev/sdX</td><td>Écrit l'ISO sur une clé USB, après confirmation. Toutes les données du périphérique sont effacées.</td></tr>
+        <tr><td>make test-vm</td><td>Démarre l'ISO dans QEMU/KVM avec un disque virtuel de test, créé au premier lancement.</td></tr>
+        <tr><td>make boot-vm</td><td>Redémarre la VM déjà installée, sans l'ISO.</td></tr>
+        <tr><td>make clean-vm</td><td>Supprime le disque de test pour repartir d'une installation vierge.</td></tr>
+        <tr><td>make lint</td><td>Lance <code class="inline">yamllint</code> et <code class="inline">ansible-lint</code>.</td></tr>
+        <tr><td>sudo freshinstall-update</td><td>Sur une machine installée : récupère les derniers changements du dépôt et relance le playbook.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="prerequis">
+    <div class="section-head">
+      <div>
+      <p class="eyebrow">[ 05 ]</p>
+      <h2>Prérequis</h2>
+      </div>
+      <p class="sub">Une machine Linux pour construire, une machine cible pour installer.</p>
+    </div>
+    <div class="req-grid">
+      <div class="card">
+        <h3 class="os"><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9Z"/></svg>Construire l'ISO</h3>
+        <ul class="req">
+          <li>Une machine Linux ou une VM avec <code class="inline">xorriso</code> et <code class="inline">wget</code>.</li>
+          <li>Environ <strong>10 Go</strong> d'espace disque (ISO source et ISO générée).</li>
+          <li>Optionnel : <code class="inline">openssl</code> et <code class="inline">python3-yaml</code> pour préremplir l'utilisateur.</li>
+          <li>Optionnel : <code class="inline">qemu-system-x86</code> pour tester sans clé USB.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 class="os"><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Machine cible</h3>
+        <ul class="req">
+          <li>Un PC x86_64 capable de démarrer sur clé USB.</li>
+          <li>Une connexion réseau au premier boot, pour cloner le dépôt et installer les paquets.</li>
+          <li>Pour le chiffrement disque matériel (optionnel) : TPM 2.0 et Secure Boot.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="liens">
+    <div class="section-head">
+      <div>
+      <p class="eyebrow">[ 06 ]</p>
+      <h2>Liens utiles</h2>
+      </div>
+      <p class="sub">Pour aller plus loin.</p>
+    </div>
+    <div class="links-grid">
+      <a class="card link-card" href="https://github.com/loicjazon/ubuntu-freshinstall#readme">
+        <svg class="link-icon" aria-hidden="true" focusable="false" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5.5C4.5 4 8 4 12 6c4-2 7.5-2 10-.5V19c-2.5-1.5-6-1.5-10 .5-4-2-7.5-2-10-.5Z"/><path d="M12 6v13.5"/></svg>
+        <span><strong>README</strong>Guide complet : build, clé USB, VM de test.</span>
+        <span class="arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="card link-card" href="https://github.com/loicjazon/ubuntu-freshinstall#ajouter-un-logiciel">
+        <svg class="link-icon" aria-hidden="true" focusable="false" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
+        <span><strong>Ajouter un logiciel</strong>apt, .deb, snap ou tarball : une ligne dans <code class="inline">all.yml</code>.</span>
+        <span class="arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="card link-card" href="https://github.com/loicjazon/ubuntu-freshinstall#dotfiles-et-secrets">
+        <svg class="link-icon" aria-hidden="true" focusable="false" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 9.2-9.2M17 6l3 3M14 9l2 2"/></svg>
+        <span><strong>Dotfiles et secrets</strong>Brancher son dépôt de dotfiles sans rien commiter.</span>
+        <span class="arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="card link-card" href="https://github.com/loicjazon/ubuntu-freshinstall/blob/main/LICENSE">
+        <svg class="link-icon" aria-hidden="true" focusable="false" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M7 21h10M4 7h16M12 3l-1 1M6 7l-3 7a3 3 0 0 0 6 0L6 7M18 7l-3 7a3 3 0 0 0 6 0l-3-7"/></svg>
+        <span><strong>Licence</strong>Licence MIT, open source.</span>
+        <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-row">
+      <p class="footer-brand"><a class="brand" href="#top"><img src="images/logo.svg" alt="" width="24" height="24"><span>ubuntu<span class="accent">-freshinstall</span></span></a></p>
+      <nav class="footer-links" aria-label="Projet">
+        <a href="https://github.com/loicjazon/ubuntu-freshinstall"><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3.1-.2-.4-.6-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.7 1.6.2 2.9.1 3.2.8.8 1.3 1.9 1.3 3.2 0 4.6-2.8 5.6-5.5 5.9.5.4.9 1.1.9 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>GitHub</a>
+        <a href="https://github.com/loicjazon/ubuntu-freshinstall/issues/new?labels=bug">Signaler un bug</a>
+        <a href="https://github.com/loicjazon/ubuntu-freshinstall/issues/new?labels=enhancement">Proposer une amélioration</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('[data-copy]').forEach(function (button) {
+    var label = button.querySelector('span') || button;
+    button.addEventListener('click', function () {
+      var text = document.querySelector('[data-cmd]').textContent;
+      var done = function () {
+        label.textContent = 'Copié ✓';
+        setTimeout(function () { label.textContent = 'Copier'; }, 2000);
+      };
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(done, function () {});
+      }
+    });
+  });
+</script>
+</body>
+</html>
