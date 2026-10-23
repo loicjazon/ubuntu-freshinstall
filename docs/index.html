@@ -154,19 +154,6 @@
     background: var(--bg-primary); font: 13px/1.6 var(--font-code); color: var(--text-primary);
   }
 
-  /* Commandes make */
-  .cmd-table { width: 100%; border-collapse: collapse; background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius); }
-  .cmd-table th, .cmd-table td { text-align: left; padding: 14px 20px; border-top: 1px solid var(--border-default); vertical-align: top; }
-  .cmd-table thead th { border-top: 0; font: 12px var(--font-code); letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); background: var(--bg-secondary); }
-  .cmd-table td:first-child { white-space: nowrap; font: 600 14px var(--font-code); color: var(--accent); }
-  .cmd-table td { color: var(--text-secondary); }
-  @media (max-width: 640px) {
-    .cmd-table thead { display: none; }
-    .cmd-table tr { display: block; border-top: 1px solid var(--border-default); padding: 12px 16px; }
-    .cmd-table tbody tr:first-child { border-top: 0; }
-    .cmd-table td { display: block; border: 0; padding: 0; }
-    .cmd-table td:first-child { white-space: normal; margin-bottom: 4px; }
-  }
 
   /* Liens utiles */
   .links-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
@@ -235,7 +222,6 @@
     <nav aria-label="Sections">
       <a class="hide-sm" href="#fonctionnement">fonctionnement</a>
       <a class="hide-sm" href="#logiciels">logiciels</a>
-      <a class="hide-sm" href="#commandes">commandes</a>
       <a href="https://github.com/loicjazon/ubuntu-freshinstall">github ↗</a>
     </nav>
   </div>
@@ -355,32 +341,10 @@
     </div>
   </section>
 
-  <section id="commandes">
-    <div class="section-head">
-      <div>
-      <p class="eyebrow">[ 04 ]</p>
-      <h2>Commandes</h2>
-      </div>
-      <p class="sub">Tout passe par le Makefile.</p>
-    </div>
-    <table class="cmd-table">
-      <thead><tr><th scope="col">Commande</th><th scope="col">Effet</th></tr></thead>
-      <tbody>
-        <tr><td>make build-iso</td><td>Télécharge l'ISO Ubuntu 26.04 Desktop si besoin, y injecte le seed autoinstall et produit <code class="inline">output/ubuntu-autoinstall.iso</code>.</td></tr>
-        <tr><td>make write-usb DEVICE=/dev/sdX</td><td>Écrit l'ISO sur une clé USB, après confirmation. Toutes les données du périphérique sont effacées.</td></tr>
-        <tr><td>make test-vm</td><td>Démarre l'ISO dans QEMU/KVM avec un disque virtuel de test, créé au premier lancement.</td></tr>
-        <tr><td>make boot-vm</td><td>Redémarre la VM déjà installée, sans l'ISO.</td></tr>
-        <tr><td>make clean-vm</td><td>Supprime le disque de test pour repartir d'une installation vierge.</td></tr>
-        <tr><td>make lint</td><td>Lance <code class="inline">yamllint</code> et <code class="inline">ansible-lint</code>.</td></tr>
-        <tr><td>sudo freshinstall-update</td><td>Sur une machine installée : récupère les derniers changements du dépôt et relance le playbook.</td></tr>
-      </tbody>
-    </table>
-  </section>
-
   <section id="prerequis">
     <div class="section-head">
       <div>
-      <p class="eyebrow">[ 05 ]</p>
+      <p class="eyebrow">[ 04 ]</p>
       <h2>Prérequis</h2>
       </div>
       <p class="sub">Une machine Linux pour construire, une machine cible pour installer.</p>
@@ -409,7 +373,7 @@
   <section id="liens">
     <div class="section-head">
       <div>
-      <p class="eyebrow">[ 06 ]</p>
+      <p class="eyebrow">[ 05 ]</p>
       <h2>Liens utiles</h2>
       </div>
       <p class="sub">Pour aller plus loin.</p>
