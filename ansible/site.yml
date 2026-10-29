@@ -34,5 +34,6 @@
     - github_cli
     - claude_code
     - forti_watch
+    - call_center
     - dotfiles
     - desktop_readme

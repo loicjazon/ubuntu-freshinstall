@@ -1,0 +1,38 @@
+---
+# Call Center (loicjazon.github.io/call-center) : indique dans la barre
+# système si un collègue Slack est en huddle, avec notification de fin de
+# call. L'installeur officiel travaille dans $HOME (~/.local/bin +
+# autostart), sans sudo : on l'exécute donc en tant qu'utilisateur
+# principal, pas en root.
+#
+# NOTE : l'application a besoin d'un jeton Slack (scope users:read) dans
+# ~/.config/call-center/token (chmod 600) ; c'est un secret, il reste donc
+# à déposer à la main (cf. instructions affichées par l'installeur).
+
+- name: Installer les bibliothèques requises par Call Center (GTK3, indicateur, notifications)
+  ansible.builtin.apt:
+    name:
+      - libgtk-3-0t64
+      - libayatana-appindicator3-1
+      - libnotify-bin
+    state: present
+
+- name: Télécharger l'installeur Call Center
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/loicjazon/call-center/main/install.sh
+    dest: /tmp/call-center-install.sh
+    mode: "0755"
+    owner: "{{ primary_user }}"
+    force: true
+
+# Le script vérifie lui-même le SHA-256 du binaire téléchargé. Sans jeton
+# Slack ou sans DISPLAY (premier boot), il ne démarre rien : l'autostart
+# prend le relais au premier login.
+- name: Installer Call Center pour l'utilisateur principal
+  ansible.builtin.command:
+    cmd: /tmp/call-center-install.sh
+    creates: "{{ primary_user_home }}/.local/bin/call-center"
+  become: true
+  become_user: "{{ primary_user }}"
+  environment:
+    HOME: "{{ primary_user_home }}"
