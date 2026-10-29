@@ -1,0 +1,33 @@
+---
+# forti-watch (loicjazon.github.io/forti-watch) : temps restant de la
+# session VPN FortiClient dans la barre système. FortiClient est installé
+# plus tôt par deb_url_packages. L'installeur officiel travaille dans
+# $HOME (~/.local/bin + autostart), sans sudo : on l'exécute donc en tant
+# qu'utilisateur principal, pas en root.
+
+- name: Installer les bibliothèques requises par forti-watch (GTK3, indicateur)
+  ansible.builtin.apt:
+    name:
+      - libgtk-3-0t64
+      - libayatana-appindicator3-1
+    state: present
+
+- name: Télécharger l'installeur forti-watch
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/loicjazon/forti-watch/main/install.sh
+    dest: /tmp/forti-watch-install.sh
+    mode: "0755"
+    owner: "{{ primary_user }}"
+    force: true
+
+# Le script vérifie lui-même le SHA-256 du binaire téléchargé. Sans
+# DISPLAY (premier boot), il n'a pas de session à démarrer : l'autostart
+# prend le relais au premier login.
+- name: Installer forti-watch pour l'utilisateur principal
+  ansible.builtin.command:
+    cmd: /tmp/forti-watch-install.sh
+    creates: "{{ primary_user_home }}/.local/bin/forti-watch"
+  become: true
+  become_user: "{{ primary_user }}"
+  environment:
+    HOME: "{{ primary_user_home }}"
